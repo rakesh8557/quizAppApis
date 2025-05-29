@@ -1,20 +1,22 @@
 package com.guts.quizApp.service;
 
+import com.guts.quizApp.controller.QuestionController;
 import com.guts.quizApp.dao.QuestionDao;
 import com.guts.quizApp.dao.QuizDao;
 import com.guts.quizApp.model.Question;
 import com.guts.quizApp.model.QuestionWrapper;
 import com.guts.quizApp.model.Quiz;
 import com.guts.quizApp.model.UserResponse;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.charset.CoderResult;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -51,14 +53,15 @@ public class QuizService {
     }
 
     public ResponseEntity<Integer> calculateResult(Integer id, List<UserResponse> userResponse) {
-        QuestionService qs = new QuestionService();
-        Integer correctAnswer = 0;
-        for (UserResponse ur : userResponse) {
-            Question q = qs.getQuestionById(ur.getQuestionId());
-            if(q.getRightAnswer().equals(ur.getResponse()))
-                correctAnswer++;
+        Quiz quiz = quizDao.findById(id).get();
+        List<Question> questions = quiz.getQuestions();
+        int right = 0;
+        int i = 0;
+        for(UserResponse response : userResponse){
+            if(response.getResponse().equals(questions.get(i).getRightAnswer()))
+                right++;
+            i++;
         }
-
-        return new ResponseEntity<>(correctAnswer, HttpStatus.OK);
+        return new ResponseEntity<>(right, HttpStatus.OK);
     }
 }

@@ -43,6 +43,7 @@ public class QuestionService {
     public Question getQuestionById(Integer id) {
         try {
             Optional<Question> existingQuestion = questionDao.findById(id);
+            System.out.println(existingQuestion.get());
             if(existingQuestion.isPresent())
                 return existingQuestion.get();
         } catch (Exception e) {
